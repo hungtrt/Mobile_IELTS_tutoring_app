@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/utils/config.dart';
 
-class DoctorCard extends StatefulWidget {
-  const DoctorCard({Key? key}) : super(key: key);
+class DoctorCard extends StatelessWidget {
+  const DoctorCard({Key? key, required this.route}) : super(key: key);
 
-  @override
-  State<DoctorCard> createState() => _DoctorCardState();
-}
-
-class _DoctorCardState extends State<DoctorCard> {
-  @override
+  final String route;
+@override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -61,7 +57,9 @@ class _DoctorCardState extends State<DoctorCard> {
             ],
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).pushNamed(route);
+        },
       ),
     );
   }
