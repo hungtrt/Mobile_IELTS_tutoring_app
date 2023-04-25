@@ -15,6 +15,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   bool isFav = false;
   @override
   Widget build(BuildContext context) {
+    final doctor = ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
       appBar: CustomAppBar(
         appTitle: 'Doctor Details',
@@ -36,16 +37,15 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            AboutDoctor(),
-            DetailBody(),
-            const Spacer(),
+            AboutDoctor(doctor: doctor,),
+            DetailBody(doctor: doctor),
             Padding(
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Button(
                   width: double.infinity,
                   title: 'Book Appointment',
                   onPressed: () {
-                    Navigator.of(context).pushNamed('booking_page');
+                    Navigator.of(context).pushNamed('booking_page', arguments: {"doctor_id": doctor['doc_id']});
                   },
                   disable: false
               ),
@@ -58,8 +58,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 }
 
 class AboutDoctor extends StatelessWidget {
-  const AboutDoctor({super.key});
+  const AboutDoctor({super.key, required this.doctor});
 
+  final Map<dynamic, dynamic> doctor;
   @override
   Widget build(BuildContext context) {
     Config().init(context);
@@ -67,17 +68,17 @@ class AboutDoctor extends StatelessWidget {
       width: double.infinity,
       child: Column(
         children: <Widget>[
-          const CircleAvatar(
-            radius: 65.0,
-            backgroundImage: AssetImage('assets/bg1.png'),
+           CircleAvatar(
+            radius: 50.0,
+            backgroundImage: NetworkImage("http://10.0.2.2:8000${doctor['doctor_profile']}"),
             backgroundColor: Colors.white,
           ),
-          Config.spaceMedium,
-          const Text(
-            'Dr Richard Tan',
-            style: TextStyle(
+          Config.spaceSmall,
+          Text(
+            'Dr ${doctor['doctor_name']}',
+            style: const TextStyle(
               color: Colors.black,
-              fontSize: 24.0,
+              fontSize: 22.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -88,7 +89,7 @@ class AboutDoctor extends StatelessWidget {
               'MBBS (HO CHI MINH UNIVERSITY INFOMATION TECHNOLOGY) INTERNATIONAL VIET NAM',
               style: TextStyle(
                 color: Colors.grey,
-                fontSize: 15,
+                fontSize: 12,
               ),
               softWrap: true,
               textAlign: TextAlign.center,
@@ -102,7 +103,7 @@ class AboutDoctor extends StatelessWidget {
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: 13,
               ),
               softWrap: true,
               textAlign: TextAlign.center,
@@ -115,8 +116,8 @@ class AboutDoctor extends StatelessWidget {
 }
 
 class DetailBody extends StatelessWidget {
-  const DetailBody({super.key});
-
+  const DetailBody({super.key, required this.doctor});
+  final Map<dynamic, dynamic> doctor;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -125,17 +126,16 @@ class DetailBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Config.spaceSmall,
-          const DoctorInfo(),
+          DoctorInfo(patients: doctor['patients'], exp: doctor['experience'],),
           Config.spaceMedium,
           const Text(
             'About Doctor',
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
           ),
           Config.spaceSmall,
-          const Text(
-            'Dr.Thanh. Thanh loc giai doc gan, khong lo bi nong trong nguoi, mua uong di chu con cho cai chi nua he, viet content cho zui chu met que',
-            style: TextStyle(
+          Text(
+            "${doctor['bio_data']}",
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
               height: 1.5,
             ),
@@ -149,27 +149,28 @@ class DetailBody extends StatelessWidget {
 }
 
 class DoctorInfo extends StatelessWidget {
-  const DoctorInfo({super.key});
-
+  const DoctorInfo({super.key, required this.patients, required this.exp});
+  final int patients;
+  final int exp;
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: const <Widget>[
+      children: <Widget>[
         InfoCard(
           label: 'Patient',
-          value: '109',
+          value: '$patients',
         ),
-        SizedBox(
+        const SizedBox(
           width: 15,
         ),
         InfoCard(
           label: 'Experiences',
-          value: '10 years',
+          value: '$exp years',
         ),
-        SizedBox(
+        const SizedBox(
           width: 15,
         ),
-        InfoCard(
+        const InfoCard(
           label: 'Ratings',
           value: '4.5',
         ),
@@ -194,8 +195,8 @@ class InfoCard extends StatelessWidget {
         color: Config.primaryColor,
       ),
       padding: const EdgeInsets.symmetric(
-        vertical: 30,
-        horizontal: 15,
+        vertical: 20,
+        horizontal: 10,
       ),
       child: Column(
         children: <Widget>[

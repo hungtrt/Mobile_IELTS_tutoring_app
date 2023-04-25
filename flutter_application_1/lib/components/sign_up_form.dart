@@ -6,15 +6,16 @@ import 'package:flutter_application_1/providers/dio_provider.dart';
 import 'package:flutter_application_1/utils/config.dart';
 import 'package:provider/provider.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class SignUpForm extends StatefulWidget {
+  const SignUpForm({Key? key}) : super(key: key);
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  State<SignUpForm> createState() => _SignUpFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
   bool obsecurePass = true;
@@ -25,6 +26,19 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          TextFormField(
+            controller: _nameController,
+            keyboardType: TextInputType.text,
+            cursorColor: Config.primaryColor,
+            decoration: const InputDecoration(
+              hintText: 'Username',
+              labelText: 'Username',
+              alignLabelWithHint: true,
+              prefixIcon: Icon(Icons.person_outlined),
+              prefixIconColor: Config.primaryColor,
+            ),
+          ),
+          Config.spaceSmall,
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
@@ -57,30 +71,38 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     icon: obsecurePass
                         ? const Icon(
-                            Icons.visibility_off_outlined,
-                            color: Colors.black38,
-                          )
+                      Icons.visibility_off_outlined,
+                      color: Colors.black38,
+                    )
                         : const Icon(
-                            Icons.visibility_outlined,
-                            color: Config.primaryColor,
-                          ))),
+                      Icons.visibility_outlined,
+                      color: Config.primaryColor,
+                    ))),
           ),
           Config.spaceSmall,
           Consumer<AuthModel>(
-            builder: (context, auth, child) {
-              return Button(
-                  width: double.infinity,
-                  title: 'Sign in',
-                  onPressed: () async {
-                    final token = await DioProvider().getToken(_emailController.text, _passController.text);
-                    if (token) {
-                      auth.loginSuccess();
-                      MyApp.navigatorKey.currentState!.pushNamed('main');
-                    }
-                  },
-                  disable: false
-              );
-            }
+              builder: (context, auth, child) {
+                return Button(
+                    width: double.infinity,
+                    title: 'Sign up',
+                    onPressed: () async {
+                      final userRegistration = await DioProvider().registerUser(_nameController.text, _emailController.text, _passController.text);
+                      if (userRegistration)
+                        {
+                          final token = await DioProvider().getToken(_emailController.text, _passController.text);
+                          if (token) {
+                            auth.loginSuccess();
+                            MyApp.navigatorKey.currentState!.pushNamed('main');
+                          }
+                        }
+                      else
+                        {
+                          print('register failed');
+                        }
+                    },
+                    disable: false
+                );
+              }
           )
         ],
       ),
