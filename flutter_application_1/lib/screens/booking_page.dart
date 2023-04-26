@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/button.dart';
 import 'package:flutter_application_1/components/custom_appbar.dart';
+import 'package:flutter_application_1/main.dart';
+import 'package:flutter_application_1/models/booking_date_time_convert.dart';
+import 'package:flutter_application_1/providers/dio_provider.dart';
 import 'package:flutter_application_1/utils/config.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class BookingPage extends StatefulWidget {
@@ -20,14 +24,25 @@ class _BookingPageState extends State<BookingPage> {
   bool _isWeekend = false;
   bool _dateSelected = false;
   bool _timeSelected = false;
+  String? token;
+  Future<void> getToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token') ?? '';
+  }
 
+  @override
+  void initState() {
+    getToken();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     Config().init(context);
+    final doctor = ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         appTitle: 'Appointment',
-        icon: const FaIcon(Icons.arrow_back_ios),
+        icon: FaIcon(Icons.arrow_back_ios),
       ),
       body: CustomScrollView(
         slivers: <Widget>[
@@ -113,8 +128,17 @@ class _BookingPageState extends State<BookingPage> {
               child: Button(
                 width: double.infinity,
                 title: 'Make Appointment',
-                onPressed: () {
-                  Navigator.of(context).pushNamed('success_booking');
+                onPressed: () async {
+                  final getDate = DateConverted.getDate(_currentDay);
+                  final getDay = DateConverted.getDay(_currentDay.weekday);
+                  final getTime = DateConverted.getTime(_currentIndex!);
+
+                  final booking = await DioProvider().bookAppointment(getDate, getDay, getTime, doctor['doctor_id'], token!);
+
+                  if (booking == 200)
+                    {
+                      MyApp.navigatorKey.currentState!.pushNamed('success_booking');
+                    }
                 },
                 disable: _timeSelected && _dateSelected ? false : true,
               ),

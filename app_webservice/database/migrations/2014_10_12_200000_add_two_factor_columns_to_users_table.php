@@ -17,7 +17,7 @@ return new class extends Migration
                     ->after('password')
                     ->nullable();
 
-            $table->text('two_factor_recovery_codes')
+            $table->text('two_factor_ recovery_codes')
                     ->after('two_factor_secret')
                     ->nullable();
 

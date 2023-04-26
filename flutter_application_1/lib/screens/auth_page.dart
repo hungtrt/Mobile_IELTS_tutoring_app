@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/login_form.dart';
+import 'package:flutter_application_1/components/sign_up_form.dart';
 import 'package:flutter_application_1/components/social_button.dart';
 import 'package:flutter_application_1/utils/config.dart';
 import 'package:flutter_application_1/utils/text.dart';
@@ -12,19 +13,19 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  bool isSignIn = true;
   @override
   Widget build(BuildContext context) {
     Config().init(context);
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 15,
         vertical: 15,
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: <Widget>[
             Text(
               AppText.enText['welcome_text']!,
@@ -35,16 +36,19 @@ class _AuthPageState extends State<AuthPage> {
             ),
             Config.spaceSmall,
             Text(
-              AppText.enText['signIn_text']!,
+              isSignIn
+              ? AppText.enText['signIn_text']!
+              : AppText.enText['register_text']!,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Config.spaceSmall,
-            const LoginForm(),
+            isSignIn ? LoginForm() : SignUpForm(),
             Config.spaceSmall,
-            Center(
+            isSignIn
+            ? Center(
               child: TextButton(
                 onPressed: () {},
                 child: Text(
@@ -56,7 +60,7 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                 ),
               ),
-            ),
+            ) : Container(),
             const Spacer(),
             Center(
               child: Text(
@@ -81,19 +85,30 @@ class _AuthPageState extends State<AuthPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  AppText.enText['signUp_text']!,
+                  isSignIn ?
+                  AppText.enText['signUp_text']!
+                  : AppText.enText['registered_text']!,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
                     color: Colors.grey.shade500,
                   ),
                 ),
-                const Text(' Sign-up',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ))
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        isSignIn = !isSignIn;
+                      });
+                    },
+                    child: Text(
+                        isSignIn ? 'Sign Up' : 'Sign In',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        )
+                    )
+                )
               ],
             )
           ],

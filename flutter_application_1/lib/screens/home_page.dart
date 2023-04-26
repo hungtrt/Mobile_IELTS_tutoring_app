@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/appointment_card.dart';
 import 'package:flutter_application_1/components/doctor_card.dart';
+import 'package:flutter_application_1/providers/dio_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/config.dart';
 
@@ -15,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 
 class _HomePageState extends State<HomePage> {
+  Map<String, dynamic> user = {};
   List<Map<String, dynamic>> medCat = [
     {
       "icon": FontAwesomeIcons.userDoctor,
@@ -41,11 +46,37 @@ class _HomePageState extends State<HomePage> {
       "category": "Respirations"
     }
   ];
+
+  Future<void> getData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token')??'';
+
+    if (token.isNotEmpty && token != '')
+      {
+        final response = await DioProvider().getUser(token);
+        if (response != null)
+          {
+            setState(() {
+              user = json.decode(response);
+            });
+          }
+      }
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     Config().init(context);
     return Scaffold(
-      body: Padding(
+      body: user.isEmpty ?
+          const Center(
+            child: CircularProgressIndicator(),
+          )
+      : Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 15
@@ -58,15 +89,15 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const <Widget>[
+                  children: <Widget>[
                     Text(
-                      'Phong',
-                      style: TextStyle(
+                      user['name'],
+                      style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       child: CircleAvatar(
                         radius: 30,
                         backgroundImage: AssetImage('assets/avatar.jpg'),
@@ -137,9 +168,10 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Config.spaceSmall,
                 Column(
-                  children: List.generate(10, (index) {
-                    return const DoctorCard(
+                  children: List.generate(user['doctor'].length, (index) {
+                    return DoctorCard(
                       route: 'doc_details',
+                      doctor: user['doctor'][index]
                     );
                   }),)
               ],
