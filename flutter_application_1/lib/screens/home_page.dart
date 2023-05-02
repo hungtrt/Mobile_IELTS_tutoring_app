@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/appointment_card.dart';
 import 'package:flutter_application_1/components/doctor_card.dart';
+import 'package:flutter_application_1/models/auth_model.dart';
 import 'package:flutter_application_1/providers/dio_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/config.dart';
@@ -20,6 +22,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> user = {};
+  Map<String, dynamic> doctor = {};
+  List<dynamic> favList = [];
   List<Map<String, dynamic>> medCat = [
     {
       "icon": FontAwesomeIcons.userDoctor,
@@ -47,30 +51,12 @@ class _HomePageState extends State<HomePage> {
     }
   ];
 
-  Future<void> getData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token')??'';
-
-    if (token.isNotEmpty && token != '')
-      {
-        final response = await DioProvider().getUser(token);
-        if (response != null)
-          {
-            setState(() {
-              user = json.decode(response);
-            });
-          }
-      }
-  }
-
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     Config().init(context);
+    user = Provider.of<AuthModel>(context, listen: false).getUser;
+    doctor = Provider.of<AuthModel>(context, listen: false).getAppointment;
+    favList = Provider.of<AuthModel>(context, listen: false).getFav;
     return Scaffold(
       body: user.isEmpty ?
           const Center(
@@ -97,10 +83,10 @@ class _HomePageState extends State<HomePage> {
                           fontWeight: FontWeight.bold
                       ),
                     ),
-                    const SizedBox(
+                     SizedBox(
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundImage: AssetImage('assets/avatar.jpg'),
+                        backgroundImage: NetworkImage("http://10.0.2.2:8000${user['profile_photo_url']}"),
                       ),
                     )
                   ],
@@ -157,7 +143,26 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Config.spaceSmall,
-                AppointmentCard(),
+                doctor.isNotEmpty ? AppointmentCard(doctor: doctor, color: Config.primaryColor)
+                : Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        'No Appointment Today',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600
+                        )
+                      ),
+                    ),
+                  ),
+                ),
                 Config.spaceSmall,
                 const Text(
                   'Top Doctors',
@@ -170,8 +175,9 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: List.generate(user['doctor'].length, (index) {
                     return DoctorCard(
-                      route: 'doc_details',
-                      doctor: user['doctor'][index]
+                      // route: 'doc_details',
+                      doctor: user['doctor'][index],
+                      isFav: favList.contains(user['doctor'][index]['doc_id']) ? true : false,
                     );
                   }),)
               ],

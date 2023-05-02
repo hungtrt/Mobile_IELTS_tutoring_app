@@ -60,6 +60,7 @@ class DioProvider {
     }
   }
 
+  // book appointment
   Future<dynamic> bookAppointment(String date, String day, String time, int doctor, String token) async {
       try
           {
@@ -79,6 +80,142 @@ class DioProvider {
       catch (error) {
         return error;
       }
+
+  }
+
+  // get all appointments of user
+  Future<dynamic> getAppointment(String token) async {
+    try
+    {
+      var response = await Dio().get('http://10.0.2.2:8000/api/appointments',
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+
+      if (response.statusCode == 200 && response.data != '')
+      {
+        return json.encode(response.data);
+      }
+      else
+      {
+        return 'Error';
+      }
+    }
+    catch (error) {
+      return error;
+    }
+
+  }
+
+  // store reviews
+  Future<dynamic> storeReview(String reviews, double ratings, int id, int doctor, String token) async {
+    try
+    {
+      var response = await Dio().post('http://10.0.2.2:8000/api/reviews',
+          data: {'ratings': ratings, 'reviews': reviews, 'appointment_id': id, 'doctor_id': doctor},
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+
+      if (response.statusCode == 200 && response.data != '')
+      {
+        return response.statusCode;
+      }
+      else
+      {
+        return 'Error';
+      }
+    }
+    catch (error) {
+      return error;
+    }
+
+  }
+
+  // store favorite doctor
+  Future<dynamic> storeFavorite(String token, List<dynamic> favList) async {
+    try
+    {
+      var response = await Dio().post('http://10.0.2.2:8000/api/fav',
+          data: {'favList': favList},
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+
+      if (response.statusCode == 200 && response.data != '')
+      {
+        return response.statusCode;
+      }
+      else
+      {
+        return 'Error';
+      }
+    }
+    catch (error) {
+      return error;
+    }
+
+  }
+
+  // logout
+  Future<dynamic> logout(String token) async {
+    try
+    {
+      var response = await Dio().post('http://10.0.2.2:8000/api/logout',
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+
+      if (response.statusCode == 200 && response.data != '')
+      {
+        return response.statusCode;
+      }
+      else
+      {
+        return 'Error';
+      }
+    }
+    catch (error) {
+      return error;
+    }
+
+  }
+
+  // cancel appointment
+  Future<dynamic> cancelAppointment(int id, String token) async {
+    try
+    {
+      var response = await Dio().post('http://10.0.2.2:8000/api/cancelBook',
+          data: {'id': id},
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+
+      if (response.statusCode == 200 && response.data != '')
+      {
+        return response.statusCode;
+      }
+      else
+      {
+        return 'Error';
+      }
+    }
+    catch (error) {
+      return error;
+    }
+
+  }
+
+  // update appointment
+  Future<dynamic> updateAppointment(String date, String day, String time, int id, String token) async {
+    try
+    {
+      var response = await Dio().post('http://10.0.2.2:8000/api/updateBook',
+          data: {'id': id, 'date': date, 'day': day, 'time': time},
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+
+      if (response.statusCode == 200 && response.data != '')
+      {
+        return response.statusCode;
+      }
+      else
+      {
+        return 'Error';
+      }
+    }
+    catch (error) {
+      return error;
+    }
 
   }
 }

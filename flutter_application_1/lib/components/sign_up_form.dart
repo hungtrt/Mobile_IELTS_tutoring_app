@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/button.dart';
 import 'package:flutter_application_1/main.dart';
@@ -91,8 +93,24 @@ class _SignUpFormState extends State<SignUpForm> {
                         {
                           final token = await DioProvider().getToken(_emailController.text, _passController.text);
                           if (token) {
-                            auth.loginSuccess();
-                            MyApp.navigatorKey.currentState!.pushNamed('main');
+                            final response = await DioProvider().getUser(token);
+                            if (response != null)
+                            {
+                              setState(() {
+                                Map<String, dynamic> appointment = {};
+
+                                final user = json.decode(response);
+                                for (var doctorData in user['doctor'])
+                                {
+                                  if (doctorData['appointment'] != null)
+                                  {
+                                    appointment = doctorData;
+                                  }
+                                }
+                                auth.loginSuccess(user, appointment);
+                                MyApp.navigatorKey.currentState!.pushNamed('main');
+                              });
+                            }
                           }
                         }
                       else

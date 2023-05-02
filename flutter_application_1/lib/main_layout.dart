@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/appointment_page.dart';
+import 'package:flutter_application_1/screens/favorite_page.dart';
 import 'package:flutter_application_1/screens/home_page.dart';
+import 'package:flutter_application_1/screens/profile_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MainLayout extends StatefulWidget {
@@ -25,7 +27,9 @@ class _MainLayoutState extends State<MainLayout> {
         }),
         children: const <Widget>[
           HomePage(),
+          FavoritePage(),
           AppointmentPage(),
+          ProfilePage()
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -44,9 +48,17 @@ class _MainLayoutState extends State<MainLayout> {
               label: 'Home'
           ),
           BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.solidHeart),
+              label: 'Favorite'
+          ),
+          BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.solidCalendarCheck),
               label: 'Appointment'
-          )
+          ),
+          BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.solidUser),
+              label: 'Profile'
+          ),
         ],
       ),
     );

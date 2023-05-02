@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/main.dart';
+import 'package:flutter_application_1/screens/doctor_details.dart';
 import 'package:flutter_application_1/utils/config.dart';
 
 class DoctorCard extends StatelessWidget {
-  const DoctorCard({Key? key, required this.route, required this.doctor}) : super(key: key);
+  const DoctorCard({Key? key, required this.doctor, required this.isFav}) : super(key: key);
 
-  final String route;
   final Map<String, dynamic> doctor;
+  final bool isFav;
 @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,18 +42,18 @@ class DoctorCard extends StatelessWidget {
                     const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      children: const <Widget>[
-                        Icon(
+                      children: <Widget>[
+                        const Icon(
                           Icons.star_border,
                           color: Colors.yellow,
                           size: 16,),
-                        Spacer(flex: 1),
-                        Text('5.0'),
-                        Spacer(flex: 1),
-                        Text('Reviews'),
-                        Spacer(flex: 1),
-                        Text('(20)'),
-                        Spacer(flex: 1),
+                        const Spacer(flex: 1),
+                        Text(doctor['ratings'].toString()),
+                        const Spacer(flex: 1),
+                        const Text('Reviews'),
+                        const Spacer(flex: 1),
+                        Text(doctor['reviews'].toString()),
+                        const Spacer(flex: 1),
                       ],
                     )
                   ],
@@ -61,7 +63,7 @@ class DoctorCard extends StatelessWidget {
           ),
         ),
         onTap: () {
-          Navigator.of(context).pushNamed(route, arguments: doctor);
+          MyApp.navigatorKey.currentState!.push(MaterialPageRoute(builder: (_) => DoctorDetails(doctor: doctor, isFav: isFav)));
         },
       ),
     );

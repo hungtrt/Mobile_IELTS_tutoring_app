@@ -132,13 +132,23 @@ class _BookingPageState extends State<BookingPage> {
                   final getDate = DateConverted.getDate(_currentDay);
                   final getDay = DateConverted.getDay(_currentDay.weekday);
                   final getTime = DateConverted.getTime(_currentIndex!);
-
-                  final booking = await DioProvider().bookAppointment(getDate, getDay, getTime, doctor['doctor_id'], token!);
-
-                  if (booking == 200)
+                  if (doctor['doctor_id'] != null)
                     {
-                      MyApp.navigatorKey.currentState!.pushNamed('success_booking');
+                      final booking = await DioProvider().bookAppointment(getDate, getDay, getTime, doctor['doctor_id'], token!);
+                      if (booking == 200)
+                      {
+                        MyApp.navigatorKey.currentState!.pushNamed('success_booking');
+                      }
                     }
+                  else if (doctor['appointment_id'] != null)
+                    {
+                      final booking = await DioProvider().updateAppointment(getDate, getDay, getTime, doctor['appointment_id'], token!);
+                      if (booking == 200)
+                      {
+                        MyApp.navigatorKey.currentState!.pushNamed('success_booking');
+                      }
+                    }
+
                 },
                 disable: _timeSelected && _dateSelected ? false : true,
               ),
